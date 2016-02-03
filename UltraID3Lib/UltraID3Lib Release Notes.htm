@@ -1,0 +1,620 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<HTML>
+	<HEAD>
+		<META http-equiv="Content-Type" content="text/html; charset=windows-1252">
+		<META content="MSHTML 6.00.2800.1264" name="GENERATOR">
+	</HEAD>
+	<BODY>
+		<H2>UltraID3Lib Release Notes</H2>
+		<TABLE id="AutoNumber1" cellSpacing="1" cellPadding="2" width="86%" border="0">
+			<TBODY>
+				<TR>
+					<TD width="14%" bgColor="#808080"><B>Date</B></TD>
+					<TD width="11%" bgColor="#808080"><B>Version</B></TD>
+					<TD width="161%" bgColor="#808080"><B>Notes</B></TD>
+				</TR>
+				<TR>
+					<TD vAlign="top" width="14%" bgColor="#c0c0c0">8 MAY 2005</TD>
+					<TD vAlign="top" width="11%" bgColor="#c0c0c0">0.9.2.8</TD>
+					<TD vAlign="top" width="161%" bgColor="#c0c0c0">
+						<ul>
+							<li>Fixed the ID3PopularimeterFrame so that it 
+							properly handles invalid frame formats.</li>
+							<li>Fixed the ID3InvolvedPeopleListFrame so that it 
+							properly handles invalid frame formats.</li>
+						</ul>
+					</TD>
+				</TR>
+				<TR>
+					<TD vAlign="top" width="14%" bgColor="#c0c0c0">27 MAR 2005</TD>
+					<TD vAlign="top" width="11%" bgColor="#c0c0c0">0.9.2.7</TD>
+					<TD vAlign="top" width="161%" bgColor="#c0c0c0">
+						<ul>
+							<li>
+							Removed UltraID3ContextMetaDataException and UltraID3MetaDataException.&nbsp; 
+							These two classes were used to give context to the ID3 exceptions.&nbsp; For 
+							example, if you check the Exception property of an ID3Frame, by definition, you 
+							already know what frame caused the exception.&nbsp; But if you instead use the 
+							UltraID3.GetExceptions method, you wouldn't have had any context for the 
+							exceptions i.e. you wouldn't know if an exception dealt with a particular ID3v2 
+							frame or with the ID3v1 tag.&nbsp; I used the above exceptions to wrap the 
+							original exceptions and gave them the needed context information.&nbsp; 
+							But...this was very confusing to anyone but me...so I rethought the 
+							design.&nbsp; What I came up with, I think, is a simple, more elegant 
+							solution.&nbsp; I now just extend all exceptions from a base UltraID3Exception 
+							which has a Parent property.&nbsp; One can examine the Parent property to get a 
+							reference to the instance of the class which caused the exception.&nbsp; For 
+							example, if a UltraID3TrackNumOutOfRangeException is returned by the 
+							UltraID3.GetExceptions method, you can look at the exception's Parent to tell 
+							what caused this exception.&nbsp; If the Parent is the ID3v1Tag, well then, the 
+							problem is with the ID3v1 Track Number field.&nbsp; If the Parent is a 
+							ID3TrackNumFrame, then you know that the problem is with the Track Number field 
+							in the ID3v2 Track Number frame.
+							<li>
+							Changed the GetFrameCount function to GetMPEGTrackInfo which returns not only a 
+							FrameCount property, but an AverageBitRate property as well.<li>
+							Added UltraID3UnexpectedException to wrap unexpected exceptions which occur 
+							during UltraID3Lib operations.&nbsp; Reading a Frame ID which is not recognized 
+							by the ID3 v2 standard would be an expected exception.&nbsp; But if something 
+							so totally unexpected happens, such as the tag format being very corrupt on 
+							non-standard, that I don't yet check for situation, then I can at least wrap it 
+							in another this class to give it some context.
+							<li>
+							Renamed UltraID3v2UnknownTextEncodingException to 
+							UltraID3v2InvalidTextEncodingException.&nbsp; (It wasn't that the text encoding 
+							code wasn't known.&nbsp; I knew what it was; it's just that it something other 
+							than what it was supposed to be.)&nbsp; "I lost my job.&nbsp; Well, I didn't 
+							*lose* my job.&nbsp; I know where it is.&nbsp; They just don't want me there 
+							anymore." - Bobcat Goldthwait
+							<li>
+							Split the UltraID3v2InvolvedPersonException into 
+							UltraID3v2InvolvedPersonNameMissingException and 
+							UltraID3v2InvolvedPersonInvolvementTypeMissingException.
+							<li>
+							Changed the access modifier of the ID3v1Tag.Delete method from Public to 
+							Friend.&nbsp; This method should only be called from the UltraID3.Write method 
+							when the ID3v1Tag.WriteFlag is set to True; not externally.
+							<li>
+							When reading an ID3v2 tag, the UltraID3TrackNumNotNumericException and 
+							UltraID3TrackCountNotNumericException are not throw, but instead are just 
+							assigned to the Frame.Exception property.&nbsp; This will allow the rest of the 
+							tag to be read.
+							<li>
+							Some of the exceptions that ended in 'TooLongException' were not inheriting 
+							from UltraID3ValueTooLongException, but from 
+							UltraID3TrackNumOutOfRangeException.&nbsp; Changed names to end in 
+							'OutOfRangeException'.
+							<li>
+							Changed the UltraID3v1CommentsTooLong28Exception and the 
+							UltraID3v1CommentsTooLong30Exception to inherit from 
+							UltraID3FieldValueTooLongException.
+							<li>
+							Renamed UltraID3TagException to UltraID3v2TagException as it was being used 
+							exclusively for v2 tag exceptions.&nbsp; In other words, I never threw any v1 
+							tag exceptions; the v1 exceptions were all at the field level.
+							<li>
+							Changed UltraID3v2MissingPictureException to inherit from 
+							UltraID3FieldException.
+							<li>
+							Changed UltraID3v2NonStandardFrameException to inherit from 
+							UltraID3v2FrameException.
+							<li>
+							Changed UltraID3v2NonStandardFrameFormatException to inherit from 
+							UltraID3v2FrameException.
+							<li>
+							Changed UltraID3v2UnableToDecodeFrameYetException to inherit from 
+							UltraID3v2FrameException.
+							<li>
+							Changed UltraID3v2UnknownTextEncodingException to inherit from 
+							UltraID3FieldException.
+							<li>
+							Changed UltraID3v2UnrecognizedPictureFormatException to inherit from 
+							UltraID3FieldException.
+							<li>
+							Changed UltraID3v2InvalidFrameLengthException to inherit from 
+							UltraID3v2FrameException.
+							<li>
+							Created UltraID3FileException.
+							<li>
+							Changed UltraID3ReadOnlyFileException to inherit from UltraID3FileException.
+							<li>
+							Changed UltraID3WriteException to inherit from UltraID3FileException.
+							<li>
+							Changed UltraID3ZeroLengthFileException to inherit from UltraID3FileException.
+							<li>
+							Changed UltraID3.MPEGInfo property to Read Only
+							<li>
+							Renamed MPEGInfo to MPEGFrameInfo.&nbsp; To differentiate it from the 
+							MPEGTrackInfo.
+							<LI>
+								Renamed UltraID3.MPEGInfo to FirstMPEGFrameInfo 
+								to reflect that this class is not based on the 
+								entire file, but instead just the first MPEG 
+								audio frame found in the file.&nbsp; An 
+								important distinction when considering variable 
+								bit rate tracks.</LI>
+							<LI>
+								Ditched the MS naming standard of dropping the 
+								capitol letters in variable names.&nbsp; For 
+								example, MS says that MPEGTrackInfo should be 
+								called MpegTrackInfo.&nbsp; But it's not 'Mpeg' 
+								dammit!&nbsp; It's MPEG!&nbsp; Mpeg is some kind 
+								of screwed up word; MPEG is an abbreviation.&nbsp; 
+								I really want to follow MS naming standards, but 
+								anything that removes information is bad.&nbsp; 
+								I supposed they did this to avoid confusion 
+								between the last letter in an acronym and the 
+								first letter in the following word, but come on!&nbsp; 
+								You're either going to know the acronym or the 
+								following word.&nbsp; Even if you were not 
+								familiar with abbreviation MPEG, would you 
+								really think that the MPEGTrackInfo was the info 
+								about an MPEGT rack?&nbsp; No!&nbsp; Give it a 
+								rest MS with this silly standard.</LI>
+							<LI>
+								Changed the name of KeyValuePair to GenreInfo.&nbsp; 
+								(I named it generically thinking that I'd use it 
+								for other things, but it turns out I was only 
+								using it just for the Genre.)&nbsp; Also, the 
+								&quot;Key&quot; and &quot;Value&quot; properties have changed to 
+								&quot;Number&quot; and &quot;Name&quot;, respectively.</LI>
+							<LI>
+								Renamed UltraID3.GenreList to GenreInfos.&nbsp; 
+								(More closely matched the new GenreInfo class 
+								name.)</LI>
+							<LI>
+								Changed the name of NameValuePair to 
+								LanguageInfo.&nbsp; (I named it generically 
+								thinking that I'd use it for other things, but 
+								it turns out I was only using it just for the 
+								Language.)&nbsp; Also, the &quot;Name&quot; and &quot;Value&quot; 
+								properties have changed to &quot;Code&quot; and &quot;Name&quot;, 
+								respectively.</LI>
+							<LI>
+								Renamed UltraID3.LanguageList to LanguageInfos.&nbsp; 
+								(More closely matched the new LanguageInfo class 
+								name.)</LI>
+						</ul>
+					</TD>
+				</TR>
+				<TR>
+					<TD vAlign="top" width="14%" bgColor="#c0c0c0">14 MAR 2005</TD>
+					<TD vAlign="top" width="11%" bgColor="#c0c0c0">0.9.2.6</TD>
+					<TD vAlign="top" width="161%" bgColor="#c0c0c0">
+						(Internal release)</TD>
+				</TR>
+				<TR>
+					<TD vAlign="top" width="14%" bgColor="#c0c0c0">&nbsp;19 JUN 2004</TD>
+					<TD vAlign="top" width="11%" bgColor="#c0c0c0">0.9.2.5</TD>
+					<TD vAlign="top" width="161%" bgColor="#c0c0c0">
+						<ul>
+							<li>
+							Fixed bug with ID3TextEncodingFrame tags with data that caused 
+							UltraID3v2UnknownTextEncodingException.&nbsp; Exception was being caught, but 
+							processing of tag would continue causing a null reference exception.&nbsp; 
+							Resolved by changing behavior of UltraID3v2UnknownTextEncodingException to a 
+							Warning.&nbsp; (Changed message appropriately as well.)
+							<li>
+							Fixed bug with numeric genre values, which were falsely interpreted as genre 
+							code numbers.
+							<li>
+								Fixed bug with ID3TextEncodingLangDescFrame.&nbsp; The Description property was 
+								defaulted to Nothing instead of String.Empty which was causing problems.</li>
+						</ul>
+					</TD>
+				</TR>
+				<TR>
+					<TD vAlign="top" width="14%" bgColor="#c0c0c0">7 MAR 2004</TD>
+					<TD vAlign="top" width="11%" bgColor="#c0c0c0">0.9.2.4</TD>
+					<TD vAlign="top" width="161%" bgColor="#c0c0c0">
+						<ul>
+							<li>
+							IsSet property of the ID3UserDefinedTextFrame and ID3UserDefinedWebAddressFrame 
+							classes now return true if the Description property is not set.&nbsp; This will 
+							allow, as specified by the ID3v23 standard, for these types of frames to be 
+							saved without a Description value.
+							<li>
+							Added the SingleInstanceFrameTypes enumeration, a subset of the FrameTypes 
+							enumeration for frames which can only have one instance per tag
+							<li>
+							Added the MultipleInstanceFrameTypes enumeration, a subset of the FrameTypes 
+							enumeration for frames which can have multiple instances per tag
+							<li>
+							Changed the ID3FrameCollection.GetFrames(ByVal frameType As FrameTypes) to use 
+							MultipleInstanceFrameTypes instead of FrameTypes.&nbsp; (It stands to reason 
+							that the only time you would require a return collection is for frames which 
+							can exist multiple times in a tag.)
+							<li>
+							Changed the ID3FrameCollection.GetFrames(ByVal frameType As 
+							MultipleInstanceFrameTypes, ByVal returnExceptionsFlag As Boolean) to use 
+							MultipleInstanceFrameTypes instead of FrameTypes.
+							<li>
+							Changed ID3FrameCollection.GetFrame(ByVal frameType As FrameTypes, ByVal 
+							addNewFrame As Boolean) to use SingleInstanceFrameTypes instead of FrameTypes.
+							<li>
+							ID3FrameCollection.GetFrame(ByVal frameType As FrameTypes) to use 
+							SingleInstanceFrameTypes instead of FrameTypes.
+							<li>
+							Removed the ID3FrameCollection.RemoveFirst and the 
+							ID3FrameCollection.GetFirstFrame methods.&nbsp; (With the new, more clear 
+							delineation between single and multiple instance frame types, I judged these 
+							methods to be unnecessary.)
+							<li>
+							Added Help file comments to all methods of the ID3FrameCollection class.
+							<li>
+							Added generic format exception handling to ID3TextEncodingLangDescFrame class
+							<li>
+							Smarter searching for first MPEG frame increases chances of accurate MPEG 
+							information.&nbsp; Now more closely matches info reported by WinAmp.
+							<li>
+								Updated MPEG duration calculation to more closely match WinAmp.&nbsp; Thanks to 
+								Malcolm Green for spotting this bug.
+							</li>
+						</ul>
+					</TD>
+				</TR>
+				<TR>
+					<TD vAlign="top" width="14%" bgColor="#c0c0c0">25 JAN 2004</TD>
+					<TD vAlign="top" width="11%" bgColor="#c0c0c0">0.9.2.3</TD>
+					<TD vAlign="top" width="161%" bgColor="#c0c0c0">
+						<ul>
+							<li>
+							Fixed bug with IsSet property of the ID3ComposersFrame, 
+							ID3DurationHoursMinutesFrame, ID3GenreFrame, ID3PartOfSetFrame, and 
+							ID3TrackNumFrame classes
+							<li>
+								Added extra error handling for invalid tag formats</li>
+						</ul>
+					</TD>
+				</TR>
+				<TR>
+					<TD vAlign="top" width="14%" bgColor="#c0c0c0">9 JAN 2004</TD>
+					<TD vAlign="top" width="11%" bgColor="#c0c0c0">0.9.2.2</TD>
+					<TD vAlign="top" width="161%" bgColor="#c0c0c0">
+						<ul>
+							<li>
+							Fixed bug which lost ID3v1 Tag which occurred when adding a new ID3v1 Tag while 
+							simultaneously expanding the ID3v2 Tag (to fit a picture, for example).&nbsp; 
+							Thanks to Brian Moore for finding this bug.
+							<li>
+							Updated ID3TextEncodingFrame.ToString to show actual FrameName instead of just 
+							"Text".
+							<li>
+							Updated ID3TextEncodingDescFrame.ToString to show actual FrameName instead of 
+							just "Text".
+							<li>
+							Updated ID3TextEncodingLangFrame.ToString to show actual FrameName instead of 
+							just "Text".
+							<li>
+							Renamed UltraID3v2FrameNoDecoderException to 
+							UltraID3v2UnableToDecodeFrameYetException (in order to more closely match the 
+							corresponding class name.)
+							<li>
+							Renamed UltraID3v2UnrecognizedFrameException to 
+							UltraID3v2NonStandardFrameException (in order to more closely match the 
+							corresponding class name.)
+							<li>
+							Added a FrameID property to the UltraID3v2UnrecognizedFrameException class.
+							<li>
+							Renamed FrameTypes.AudioCrypto to AudioEncryption
+							<li>
+							Renamed FrameTypes.BPM to AudioEncryption
+							<li>
+							Renamed FrameTypes.Comment to Comments
+							<li>
+							Renamed FrameTypes.SongLen to DurationMilliseconds
+							<li>
+							Renamed FrameTypes.Date to RecordingDayMonth
+							<li>
+							Renamed FrameTypes.Size to SizeBytes
+							<li>
+							Renamed FrameTypes.Encryption to EncryptionMethodRegistration
+							<li>
+							Renamed FrameTypes.GeneralObject to GeneralEncapsulatedObject
+							<li>
+							Renamed FrameTypes.VolumeAdj to RelativeVolumeAdjustment
+							<li>
+							Renamed FrameTypes.Time to DurationHoursMinutes
+							<li>
+							Renamed FrameTypes.MixArtist to InterpretedBy
+							<li>
+							Renamed FrameTypes.UserText to UserDefinedText
+							<li>
+							Renamed FrameTypes.OrigAlbum to OriginalAlbum
+							<li>
+							Renamed FrameTypes.OrigFileName to OriginalFileName
+							<li>
+							Renamed FrameTypes.OrigLyricist to OriginalLyricist&nbsp;
+							<li>
+							Renamed FrameTypes.OrigArtist to OriginalArtist
+							<li>
+							Renamed FrameTypes.OrigYear to OriginalYear
+							<li>
+							Renamed FrameTypes.WWWCopyright to CopyrightInformationWebAddress
+							<li>
+							Renamed FrameTypes.WWWCommercialInfo to CommercialInformationWebAddressFrame
+							<li>
+							Renamed FrameTypes.WWWAudioFile to OfficialAudioFileWebAddress
+							<li>
+							Renamed FrameTypes.WWWArtist to OfficialArtistWebAddress
+							<li>
+							Renamed FrameTypes.WWWAudioSource to OfficialAudioSourceWebAddress
+							<li>
+							Renamed FrameTypes.WWWRadioPage to OfficialInternetRadioStationWebAddress
+							<li>
+							Renamed FrameTypes.WWWPayment to PaymentWebAddress
+							<li>
+							Renamed FrameTypes.WWWPublisher to PublisherWebAddress
+							<li>
+							Renamed FrameTypes.WWWUser to UserDefinedWebAddress
+							<li>
+							Renamed FrameTypes.PlayListDelay to PlayListDelayMilliseconds
+							<li>
+							CDID to CompactDiscIdentifier
+							<li>
+							ContentDescription to ContentGroupDescription
+							<li>
+							Copyright to CopyrightMessage
+							<li>
+							EventTiming to EventTimingCodes
+							<li>
+							GroupingID to GroupIdentificationRegistration
+							<li>
+							ISRC to InternationalStandardRecordingCode
+							<li>
+							InvolvedPeople to InvolvedPeopleList
+							<li>
+							NetRadioStation to NetRadioStationName
+							<li>
+							NetRadioOwner to InternetRadioStationOwner
+							<li>
+							NetRadioStationName to InternetRadioStationName
+							<li>
+							OfficialArtistWebAddress to OfficialAudioSourceWebAddress
+							<li>
+							LinkedInfo to LinkedInformation
+							<li>
+							MPEGLookup to MpegLocationLookupTable
+							<li>
+							Renamed ID3RecordingDurationMillisecondsFrame to ID3DurationMillisecondsFrame
+							<li>
+							Fixed bug in constructor of ID3DurationMillisecondsFrame
+							<li>
+							Renamed ID3RecordingDurationTimeFrame to ID3DurationHoursMinutesFrame
+							<li>
+							Updated ID3DurationHoursMinutesFrame to have a TimeSpan property instead of a 
+							String
+							<li>
+							Added missing FrameType property to ID3RelativeVolumeAdjustmentFrame
+							<li>
+							Added missing FrameType property to ID3OwnershipFrame
+							<li>
+							Added missing FrameType property to ID3PositionSychronizationFrame
+							<li>
+							Added missing FrameType property to ID3RecommendedBufferSizeFrame
+							<li>
+							Added missing FrameType property to ID3SynchronizedLyricsFrame
+							<li>
+							Added missing FrameType property to ID3SynchronizedTempoCodesFrame
+							<li>
+							Added an UltraID3v2DurationMillisecondsNotNumericException to 
+							ID3DurationMillisecondsFrame
+							<li>
+							Added an UltraID3v2SizeBytesNotNumericException to ID3SizeBytesFrame
+							<li>
+							The ID3GroupIdentificationRegistrationFrame class incorrectly had the FrameType 
+							of GeneralEncapsulatedObject
+							<li>
+							Fixed bug where ID3v23Tag.GetNewFrame returned ID3OriginalYearFrame when 
+							OriginalArtist was specified
+							<li>
+							Fixed bug where ID3v23Tag.GetNewFrame returned 
+							ID3OfficialAudioFileWebAddressFrame when CopyrightInformationWebAddress was 
+							specified
+							<li>
+							Renamed ID3OwnerFrame class to ID3FileOwnerFrame
+							<li>
+							Renamed ID3PlaylistDelayFrame class to ID3PlaylistDelayMillisecondsFrame
+							<li>
+							Split UltraID3ValueTooLongException into UltraID3ValueTooLongException and 
+							UltraID3ValueOutOfRangeException.
+							<li>
+							Added UltraID3v2MonthOutOfRangeException
+							<li>
+							Added UltraID3v2DayOutOfRangeException
+							<li>
+								Added UltraID3v2MonthOutOfRangeException and UltraID3v2DayOutOfRangeException 
+								checking to ID3RecordingDayMonthFrame.</li>
+						</ul>
+					</TD>
+				</TR>
+				<TR>
+					<TD vAlign="top" width="14%" bgColor="#c0c0c0">21 DEC 2003</TD>
+					<TD vAlign="top" width="11%" bgColor="#c0c0c0">0.9.2.1</TD>
+					<TD vAlign="top" width="161%" bgColor="#c0c0c0">
+						<ul>
+							<li>
+							Fixed bug with UltraID3ValueTooLongException message (discovered from test scan 
+							done by Chris Armogida).&nbsp; Thanks Chris.
+							<li>
+							Fixed bug with blank Text value in ID3RecordingDayMonthFrame (discovered from 
+							test scan done by Chris Armogida).&nbsp; Thanks again, Chris. I owe you a 
+							beer.&nbsp; ;-)
+							<li>
+								Fixed bug with ID3UserDefinedTextFrame from inheriting from wrong base frame 
+								class, thus causing the decode process to fail (discovered from test scan done 
+								by Chris Armogida.)&nbsp; Thank you <i>again</i>, Chris.&nbsp; I owe you 
+							not just any beer, but a genuine Guinness!
+							<li>
+							Changed UltraID3v2InvolvedPersonException to an ExceptionLevel of Warning
+							<li>
+								Fixed bug with exceptions caused during setting an UltraID3 "generic" 
+								property.&nbsp; Would not create UltraID3ContextMetaDataException to give 
+								context to the exception i.e. to prepend the exception message with "Exception 
+								with ID3 v1 Tag:".</li>
+						</ul>
+					</TD>
+				</TR>
+				<TR>
+					<TD vAlign="top" width="14%" bgColor="#c0c0c0">20 DEC 2003</TD>
+					<TD vAlign="top" width="11%" bgColor="#c0c0c0">0.9.2.0</TD>
+					<TD vAlign="top" width="161%" bgColor="#c0c0c0">
+						<ul>
+							<li>
+							Big change!&nbsp; For every one of the seventy-four Frame ID's as described in 
+							the ID3 v2.3 standard, there is now a specific class.&nbsp; This required the 
+							addition of quite a few new classes -- most of which simply have a single 
+							String property -- but this change will make it much more intuitive to create 
+							new instances of a particular Frame. This change will also allow for easier 
+							conversion of existing frames to make them specific to their particular Frame 
+							data.&nbsp; For example, the ID3BeatsPerMinuteFrame has a simple Text property 
+							(which is a String), where it should be locked down to a numeric value.
+							<li>
+							Removed FrameInfo class and UltraID3.GetFrameInfo method (as they are no longer 
+							required because of above change).
+							<li>
+							Added FrameName and FrameDescription properties to ID3Frame class (as a 
+							replacement for removed FrameInfo).
+							<li>
+							Renamed ID3Frame.ID to FrameID to match the newly added FrameName and 
+							FrameDescription.&nbsp; The "Frame" prefix of the property name is now used to 
+							differentiate properties that apply to the frame class as opposed to the frame 
+							instance.&nbsp; (I had to use the "Frame" for the Description property of the 
+							Comments frame because it already had a Description property.&nbsp; So, to be 
+							consistent, I used the prefix for the ID and Name properties as well.)
+							<li>
+							Split the ID3UndecodableFrame into ID3NonStandardFrame (for frames which don't 
+							comply to the ID3v23 standard) and ID3UnableToDecodeYetFrame (for frames which 
+							are valid, but where I just haven't yet written the code to decode the frame.)
+							<li>
+							Fixed bug when setting the Genre field.&nbsp; Due to a tragic cut-and-paste 
+							accident, the Artist was erroneously getting set.
+							<li>
+							Added OwnerIdentifier property to ID3PrivateFrame class.
+							<li>
+							Added GetNewFrame to UltraID3v23Tag class.
+							<li>
+								Added UltraID3MPEGInvalidHeaderZeroDurationException</li>
+						</ul>
+					</TD>
+				</TR>
+				<TR>
+					<TD vAlign="top" width="14%" bgColor="#c0c0c0">28 NOV 2003</TD>
+					<TD vAlign="top" width="11%" bgColor="#c0c0c0">0.9.1.4</TD>
+					<TD vAlign="top" width="161%" bgColor="#c0c0c0">
+						<UL>
+							<LI>
+							Converted library to .NET Framework version 1.1<LI>
+							Added ExceptionType property to UltraID3TagException so as to distinguish 
+							between Errors and Warnings.<LI>
+							Added UltraID3ZeroLengthFileException class<LI>Added 
+							ID3CompactDiscIdentifierFrame class<LI>
+							Added ID3RecordingDateFrame class<LI>Fixed bug with ID3InvolvedPersonListFrame 
+							ToString method<LI>Fixed bug which disabled the reading of MPEG data when 
+							expanding the size of the ID3 header.&nbsp; (Thanks to Brian Moore 
+							for&nbsp;identifying this bug.)
+							<LI>
+							Fix incorrect behavior of not removing the space in the padding left when 
+							deleting a picture frame.&nbsp; A too-large padding section was causing Windows 
+							Media Player to assume the MP3 was corrupt.&nbsp; (Thanks to Brian Moore 
+							for&nbsp;identifying this bug.)
+							<LI>
+								Removed mimeType parameter from the ID3PictureFrame constructor (as the MIIME 
+								Type is now determined by the Bitmap.RawFormat.Guid property).</LI></UL>
+					</TD>
+				</TR>
+				<TR>
+					<TD vAlign="top" width="14%" bgColor="#c0c0c0">13 APR 2003</TD>
+					<TD vAlign="top" width="11%" bgColor="#c0c0c0">0.9.1.3</TD>
+					<TD vAlign="top" width="161%" bgColor="#c0c0c0">
+						<UL>
+							<LI>
+							To make setting the values to blank easier, all TrackNum, TrackCount, and Year 
+							properties are now String.&nbsp; Member variables are still numeric and 
+							appropriate exceptions will be thrown when values are set to non-numeric data.
+							<LI>
+							Added UltraID3TrackCountNotNumericException (which is now properly referenced 
+							when setting a non-numeric Track Count i.e. '3/Ten'.)
+							<LI>
+							Added checks to track number (which will throw 
+							(UltraID3TrackNumNotNumericException,&nbsp; 
+							UltraID3TrackCountNotNumericException, UltraID3TrackNumTooLongException, and 
+							UltraID3TrackCountTooLongException) to initial read.
+							<LI>
+							Added extra checks to Language codes (to catch instances where there were 
+							NullChars in the value)
+							<LI>
+							ID3UniqueFileIDFrame.ToString now shows actual byte array length instead of 
+							"Byte[]"
+							<LI>
+							Changed the constructors of many internally-used classes (such as exceptions 
+							inherited from UltraID3Exception) from Public to Protected Friend.&nbsp; This 
+							is so these classes can only be instantiated from within UltraID3Lib or by an 
+							inheriting class.
+							<LI>
+							Renamed the FrameTypeEnum enum to FrameTypes.&nbsp; MS and FxCop say to not 
+							include the word "enum" in the enum name, so I took it out.
+							<LI>
+								Renamed the following enums by adding an "s" (so the plural would be the name 
+								of the enum itself and the singular would be the name of a particular 
+								instance):&nbsp; ID3TagVersion, MP3HeaderSections, TextEncodingType, ModeType, 
+								EmphasisTypes, LevelType, LayerType, PictureType
+							</LI>
+						</UL>
+					</TD>
+				</TR>
+				<TR>
+					<TD vAlign="top" width="14%" bgColor="#c0c0c0">5 FEB 2003</TD>
+					<TD vAlign="top" width="11%" bgColor="#c0c0c0">0.9.1.2</TD>
+					<TD vAlign="top" width="161%" bgColor="#c0c0c0">
+						<UL>
+							<LI>
+							Consolidated duplicate Genre definitions.&nbsp; All references to Genres now 
+							include all 147 valid values.
+							<LI>
+								Replaced calls to Chr() in ID3v1.Write with proper ASCII encoding conversion 
+								(which might have avoid some problems with saving large Track numbers.)
+							</LI>
+						</UL>
+					</TD>
+				</TR>
+				<TR>
+					<TD vAlign="top" width="14%" bgColor="#c0c0c0">28 JAN 2003</TD>
+					<TD vAlign="top" width="11%" bgColor="#c0c0c0">0.9.1.1</TD>
+					<TD vAlign="top" width="161%" bgColor="#c0c0c0">
+						<UL>
+							<LI>
+							Fixed bug where setting the Genre to an empty string would set the ID3v1 Genre 
+							code to 0 instead of 255.&nbsp; Genre 0 is "Blues".&nbsp; Genre 255 is used by 
+							WinAmp to represent "Unknown".
+							<LI>
+								Added "missing" Genre codes.&nbsp; (The ID3v1 standards document at <A href="http://www.id3.org/">
+									http://www.id3.org/</A>
+							did not list genres WinAmp 126 to 147.)&nbsp; Thanks to Cliff Williams for 
+							spotting this bug.
+							<LI>
+							Fixed sort order of Genres list
+							<LI>
+								Removed ID3v2.Genres property.&nbsp; The ID3v2 standards states you can have 
+								multiple genres stored in a single Genre frame, but is unclear on exactly <I>how</I>
+								this is done.&nbsp; Besides, the major tag editing tools (WinAmp, MusicMatch, 
+								and Windows Media Player) don't support multiple tags either.
+							</LI>
+						</UL>
+					</TD>
+				</TR>
+				<TR>
+					<TD vAlign="top" width="14%" bgColor="#c0c0c0">20 NOV 2002</TD>
+					<TD vAlign="top" width="11%" bgColor="#c0c0c0">0.9.1.0</TD>
+					<TD vAlign="top" width="161%" bgColor="#c0c0c0">
+						<UL>
+							<LI>
+								Initial "semi-public" beta release of UltraID3Lib.&nbsp; Includes fairly 
+								detailed documentation.&nbsp; (Retired the 0.9.0.X alpha version series.)
+							</LI>
+						</UL>
+					</TD>
+				</TR>
+			</TBODY></TABLE>
+	</BODY>
+</HTML>
